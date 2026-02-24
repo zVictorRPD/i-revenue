@@ -4,35 +4,16 @@ import { CircleDollarSignIcon, MoreHorizontalIcon, PencilIcon, TrashIcon } from 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { maskMoney } from "@/utils/mask";
-import { TypeIcons, type BenefitType, type RevenueType } from "@/components/global/typeIcons";
-
-type Revenue = {
-  id: number;
-  type: RevenueType;
-  cycle: 'monthly' | 'yearly';
-  description: string;
-  min_revenue: number;
-  max_revenue: number;
-  benefits?: {
-    id: number;
-    type: BenefitType;
-    name: string;
-    value: number;
-    cycle: 'monthly' | 'yearly';
-  }[];
-  taxes?: {
-    name: string;
-    value: number;
-    cycle: 'monthly' | 'yearly';
-  }[];
-}
+import { TypeIcons } from "@/components/global/typeIcons";
+import type { Revenue } from "@/types/revenue";
+import useRevenueStore from "@/storage/revenue";
 
 const revenueData: Revenue[] = [
   {
     id: 1,
     type: 'clt',
     cycle: 'monthly',
-    description: 'Salário Havan',
+    name: 'Salário Havan',
     min_revenue: 4000,
     max_revenue: 5000,
     benefits: [
@@ -82,7 +63,7 @@ const revenueData: Revenue[] = [
     id: 2,
     type: 'pj',
     cycle: 'monthly',
-    description: 'Freelancer',
+    name: 'Freelancer',
     min_revenue: 6000,
     max_revenue: 8000,
     benefits: [
@@ -112,6 +93,11 @@ const revenueData: Revenue[] = [
 ]
 
 export function RevenueCards() {
+  const setDeleteRevenueAlertData = useRevenueStore((state) => state.setDeleteRevenueAlertData);
+  const handleDeleteRevenue = (revenue: Revenue) => {
+    setDeleteRevenueAlertData(true, revenue);
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {revenueData.map((revenue) => (
@@ -121,7 +107,7 @@ export function RevenueCards() {
               <TypeIcons type={revenue.type} />
               {revenue.type}
             </Badge>
-            <CardDescription className="text-md">{revenue.description}</CardDescription>
+            <CardDescription className="text-md">{revenue.name}</CardDescription>
             <CardTitle className="text-lg font-semibold tabular-nums">
               {maskMoney(revenue.min_revenue)} - {maskMoney(revenue.max_revenue)}
             </CardTitle>
@@ -139,7 +125,7 @@ export function RevenueCards() {
                       <PencilIcon />
                       Editar
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDeleteRevenue(revenue)}>
                       <TrashIcon />
                       Deletar
                     </DropdownMenuItem>

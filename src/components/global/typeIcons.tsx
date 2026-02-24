@@ -1,15 +1,6 @@
+import type { AllIconTypes, TypeIconsProps } from "@/types/global";
 import { BriefcaseIcon, CarFrontIcon, ForkKnifeCrossedIcon, HandshakeIcon, HeartPulseIcon } from "lucide-react";
 import type { JSX } from "react";
-
-export type RevenueType = 'clt' | 'pj';
-export type BenefitType = 'food' | 'health' | 'transport';
-
-export type AllIconTypes = RevenueType | BenefitType;
-
-type TypeIconsProps = {
-  type: AllIconTypes;
-  className?: string;
-}
 
 export function TypeIcons({ type, className }: TypeIconsProps) {
   const icons = {
@@ -17,8 +8,12 @@ export function TypeIcons({ type, className }: TypeIconsProps) {
     health: <HeartPulseIcon className={className} />,
     transport: <CarFrontIcon className={className} />,
     clt: <BriefcaseIcon className={className} />,
-    pj: <HandshakeIcon className={className} />
+    pj: <HandshakeIcon className={className} />,
+    freelance: <BriefcaseIcon className={className} />,
+    donation: <HeartPulseIcon className={className} />,
+    other: <BriefcaseIcon className={className} />
+  
   } as Record<AllIconTypes, JSX.Element>;
 
-  return icons[type] || null;
+  return icons[type] || <BriefcaseIcon className={className} />;
 }

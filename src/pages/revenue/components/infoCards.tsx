@@ -27,7 +27,7 @@ const mockRevenue = [
     icon: <TrendingDownIcon className="text-red-500" />
   }
 ]
-export function InfoCards() {
+export function RevenueInfoCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-800">
       {mockRevenue.map((item) => (

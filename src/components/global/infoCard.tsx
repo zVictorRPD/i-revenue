@@ -1,11 +1,5 @@
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ReactNode } from "react";
-
-type InfoCardProps = {
-  title: string;
-  value: string;
-  icon?: ReactNode;
-}
+import type { InfoCardProps } from "@/types/global";
 
 export function InfoCard({ title, value, icon }: InfoCardProps) {
   return (

@@ -1,19 +1,26 @@
 
 import { PageHeader } from "@/components/global/pageHeader";
 import { PlusIcon } from "lucide-react";
-import { InfoCards } from "./components/infoCards";
-import { RevenueCards } from "./components/revenueCards";
+import { RevenueInfoCards } from "./components/infoCards";
+import { RevenueCards } from "./components/cards";
+import useRevenueStore from "@/storage/revenue";
+import { RevenueAddModal } from "./components/addModal";
+import { RevenueDeleteAlert } from "./components/deleteAlert";
 
 export function Revenue() {
+  const setAddRevenueModalOpen = useRevenueStore((state) => state.setAddRevenueModalOpen);
   function handleAddRevenue() {
-    console.log("Adicionar Nova Renda");
+    setAddRevenueModalOpen(true);
   }
 
   return (
     <>
       <PageHeader title="Renda" button={{ text: "Adicionar Renda", action: handleAddRevenue, icon: <PlusIcon /> }} />
-      <InfoCards />
+      <RevenueInfoCards />
       <RevenueCards />
+
+      <RevenueAddModal />
+      <RevenueDeleteAlert />
     </>
   )
 }

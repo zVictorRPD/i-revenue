@@ -1,13 +1,5 @@
 import { Button } from "@/components/ui/button";
-
-type PageHeaderProps = {
-  title: string;
-  button?: {
-    text: string;
-    action: () => void;
-    icon?: React.ReactNode;
-  }
-}
+import type { PageHeaderProps } from "@/types/global";
 
 export function PageHeader({ title, button }: PageHeaderProps) {
   return (
