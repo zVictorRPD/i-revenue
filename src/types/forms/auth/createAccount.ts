@@ -9,3 +9,5 @@ export const createAccountFormSchema = z.object({
   message: "As senhas não coincidem.",
   path: ["confirmPassword"],
 });
+
+export type CreateAccountFormData = z.infer<typeof createAccountFormSchema>;
