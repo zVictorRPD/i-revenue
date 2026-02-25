@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { createAccountFormSchema } from "@/types/forms/auth/createAccount";
+import { createAccountFormSchema, type CreateAccountFormData } from "@/types/forms/auth/createAccount";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
+import { toast } from "sonner";
 
 export function CreateAccount() {
   const {
@@ -15,8 +17,25 @@ export function CreateAccount() {
     resolver: zodResolver(createAccountFormSchema),
   });
 
+
+  const mutation = useMutation({
+    mutationFn: async (data: CreateAccountFormData) => {
+      await new Promise((resolve, reject) => setTimeout(() => {
+        return Math.random() > 0.5 ? resolve(undefined) : reject(new Error("Erro de criação de conta simulado"))
+      }, 1000));
+      console.log(data);
+    },
+    onSuccess: () => {
+      toast.success("Conta criada com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Ocorreu um erro ao criar a conta.");
+      console.error(error);
+    },
+  });
+
   return (
-    <form onSubmit={handleSubmit((data) => console.log(data))}>
+    <form onSubmit={handleSubmit((data) => mutation.mutate(data))}>
       <FieldGroup>
         <Field data-invalid={!!errors.name}>
           <FieldLabel htmlFor="name">Nome</FieldLabel>
@@ -74,7 +93,12 @@ export function CreateAccount() {
         </Field>
         <FieldGroup className="mt-4">
           <Field>
-            <Button type="submit">Criar Conta</Button>
+            <Button
+              type="submit"
+              loading={mutation.isPending}
+            >
+              Criar Conta
+            </Button>
             <FieldDescription className="px-6 text-center mt-2!">
               Já tem uma conta? <Link to="/login">Login</Link>
             </FieldDescription>
