@@ -1,14 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
-import { useForm } from "react-hook-form"
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginFormSchema, type LoginFormData } from "@/types/forms/auth/login";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { handleMutationError, post } from "@/utils/api";
+import type { User } from "@/types/user";
+import { useUserStore } from "@/storage/user";
 
 export function Login() {
+  const setUser = useUserStore((state) => state.setUser);
   const {
     register,
     handleSubmit,
@@ -18,18 +28,16 @@ export function Login() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: LoginFormData) => {
-      await new Promise((resolve, reject) => setTimeout(() => {
-        return Math.random() > 0.5 ? resolve(undefined) : reject(new Error("Erro de login simulado"))
-      }, 1000));
-      console.log(data);
+    mutationFn: async (payload: LoginFormData) => {
+      return await post<User>("/auth/login", payload);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setUser(data.data);
       toast.success("Login bem-sucedido!");
     },
     onError: (error) => {
-      toast.error("Ocorreu um erro ao fazer login.");
-      console.error(error);
+      const message = handleMutationError(error);
+      toast.error(message);
     },
   });
 
@@ -60,10 +68,7 @@ export function Login() {
         </Field>
         <FieldGroup className="mt-4">
           <Field>
-            <Button
-              type="submit"
-              loading={mutation.isPending}
-            >
+            <Button type="submit" loading={mutation.isPending}>
               Fazer Login
             </Button>
             <FieldDescription className="px-6 text-center mt-2!">
@@ -73,5 +78,5 @@ export function Login() {
         </FieldGroup>
       </FieldGroup>
     </form>
-  )
+  );
 }

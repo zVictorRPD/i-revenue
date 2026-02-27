@@ -1,7 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { createAccountFormSchema, type CreateAccountFormData } from "@/types/forms/auth/createAccount";
+import { useUserStore } from "@/storage/user";
+import {
+  createAccountFormSchema,
+  type CreateAccountFormData,
+} from "@/types/forms/auth/createAccount";
+import type { User } from "@/types/user";
+import { handleMutationError, post } from "@/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -9,6 +21,7 @@ import { Link } from "react-router";
 import { toast } from "sonner";
 
 export function CreateAccount() {
+  const setUser = useUserStore((state) => state.setUser);
   const {
     register,
     handleSubmit,
@@ -17,20 +30,22 @@ export function CreateAccount() {
     resolver: zodResolver(createAccountFormSchema),
   });
 
-
   const mutation = useMutation({
-    mutationFn: async (data: CreateAccountFormData) => {
-      await new Promise((resolve, reject) => setTimeout(() => {
-        return Math.random() > 0.5 ? resolve(undefined) : reject(new Error("Erro de criação de conta simulado"))
-      }, 1000));
-      console.log(data);
+    mutationFn: async (payload: CreateAccountFormData) => {
+      const formattedPayload = {
+        name: payload.name,
+        email: payload.email,
+        password: payload.password,
+      };
+      return await post<User>("/auth/register", formattedPayload);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setUser(data.data);
       toast.success("Conta criada com sucesso!");
     },
     onError: (error) => {
-      toast.error("Ocorreu um erro ao criar a conta.");
-      console.error(error);
+      const message = handleMutationError(error);
+      toast.error(message);
     },
   });
 
@@ -68,20 +83,16 @@ export function CreateAccount() {
             {...register("password")}
             aria-invalid={!!errors.password}
           />
-          {!errors.password ?
-            (
-              <FieldDescription>
-                Deve conter pelo menos 8 caracteres.
-              </FieldDescription>
-            ) : (
-              <FieldError>{errors.password?.message}</FieldError>
-            )
-          }
+          {!errors.password ? (
+            <FieldDescription>
+              Deve conter pelo menos 8 caracteres.
+            </FieldDescription>
+          ) : (
+            <FieldError>{errors.password?.message}</FieldError>
+          )}
         </Field>
         <Field data-invalid={!!errors.confirmPassword}>
-          <FieldLabel htmlFor="confirm-password">
-            Confirmar Senha
-          </FieldLabel>
+          <FieldLabel htmlFor="confirm-password">Confirmar Senha</FieldLabel>
           <Input
             id="confirm-password"
             type="password"
@@ -93,10 +104,7 @@ export function CreateAccount() {
         </Field>
         <FieldGroup className="mt-4">
           <Field>
-            <Button
-              type="submit"
-              loading={mutation.isPending}
-            >
+            <Button type="submit" loading={mutation.isPending}>
               Criar Conta
             </Button>
             <FieldDescription className="px-6 text-center mt-2!">
@@ -106,5 +114,5 @@ export function CreateAccount() {
         </FieldGroup>
       </FieldGroup>
     </form>
-  )
+  );
 }
