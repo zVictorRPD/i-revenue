@@ -54,7 +54,10 @@ export function RevenueAddModal() {
             freelance, vendas, etc.
           </DialogDescription>
         </DialogHeader>
-        <RevenueForm onSubmit={handleAddRevenue} />
+        <RevenueForm
+          key={`add-${String(addRevenueModalOpen)}`}
+          onSubmit={handleAddRevenue}
+        />
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancelar</Button>

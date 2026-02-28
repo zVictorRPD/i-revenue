@@ -16,15 +16,10 @@ api.interceptors.request.use((config) => {
   const userStore = localStorage.getItem("i-revenue-user") as string | null;
   const user: zustandUserStore | null = userStore ? JSON.parse(userStore) : null;
   const path = config.url || "";
-  console.log(path);
-  console.log(path.includes("/login"));
-
   if (path.includes("/login") || path.includes("/register")) {
     config.baseURL = config.baseURL?.replace("/api", "");
     return config;
   }
-  console.log(user);
-
   if (user) {
     config.headers["Authorization"] = `Bearer ${user.state.user?.token}`;
   }
@@ -53,8 +48,6 @@ export async function get<T>(url: string): Promise<Response<T>> {
 
 export async function post<T>(url: string, data?: unknown): Promise<Response<T>> {
   const response = await api.post<Response<T>>(url, data);
-  console.log(response);
-
   return response.data;
 }
 

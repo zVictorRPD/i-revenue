@@ -9,6 +9,7 @@ import { get } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import type { CalculatedRevenueData, Revenue } from "@/types/revenue";
 import { useMemo } from "react";
+import { RevenueEditModal } from "./components/editModal";
 
 export function Revenue() {
   const setAddRevenueModalOpen = useRevenueStore(
@@ -67,6 +68,7 @@ export function Revenue() {
       />
       <RevenueCards revenues={revenues?.data} isLoading={isLoading} />
       <RevenueAddModal />
+      <RevenueEditModal />
       <RevenueDeleteAlert />
     </>
   );

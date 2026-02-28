@@ -30,26 +30,55 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { maskInputMoney } from "@/utils/mask";
+import type { Revenue } from "@/types/revenue";
+import { useMemo } from "react";
+import type { z } from "zod";
 
 interface RevenueFormProps {
   onSubmit: (data: RevenueFormData) => void;
+  revenue?: Revenue | null;
 }
 
-export function RevenueForm({ onSubmit }: RevenueFormProps) {
+type RevenueFormInput = z.input<typeof revenueFormSchema>;
+
+export function RevenueForm({ onSubmit, revenue }: RevenueFormProps) {
+  const defaultValues = useMemo(
+    () => ({
+      name: revenue?.name ?? "",
+      type: revenue?.type || "other",
+      revenueAsRange:
+        revenue?.max_revenue !== null && revenue?.max_revenue !== undefined,
+      min_revenue:
+        revenue?.min_revenue !== undefined ? String(revenue.min_revenue) : "",
+      max_revenue:
+        revenue?.max_revenue !== null && revenue?.max_revenue !== undefined
+          ? String(revenue.max_revenue)
+          : "",
+      cycle: revenue?.cycle || "monthly",
+      benefits:
+        revenue?.benefits?.map((benefit) => ({
+          type: benefit.type,
+          value: String(benefit.value),
+        })) ?? [],
+      taxes:
+        revenue?.taxes?.map((tax) => ({
+          name: tax.name,
+          value: String(tax.value),
+        })) ?? [],
+    }),
+    [revenue],
+  );
+
   const {
     control,
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm({
+  } = useForm<RevenueFormInput, unknown, RevenueFormData>({
     resolver: zodResolver(revenueFormSchema),
     shouldUnregister: true,
-    defaultValues: {
-      revenueAsRange: false,
-      benefits: [],
-      taxes: [],
-    },
+    defaultValues,
   });
 
   const {
@@ -86,17 +115,17 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
           <FieldError>{errors.name?.message}</FieldError>
         </Field>
         <Field>
-          <FieldLabel>Tipo</FieldLabel>
+          <FieldLabel htmlFor="type">Tipo</FieldLabel>
           <Controller
             name="type"
             control={control}
             render={({ field }) => (
               <Select
-                value={field.value}
+                name={field.name}
+                value={field.value ?? ""}
                 onValueChange={field.onChange}
-                aria-invalid={!!errors.type}
               >
-                <SelectTrigger>
+                <SelectTrigger id="type" aria-invalid={!!errors.type}>
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -123,13 +152,13 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
                 render={({ field }) => (
                   <Switch
                     size="sm"
-                    id="airplane-mode"
+                    id="revenueAsRange"
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
                 )}
               />
-              <Label htmlFor="airplane-mode">Receita como intervalo</Label>
+              <Label htmlFor="revenueAsRange">Receita como intervalo</Label>
             </div>
           </FieldLabel>
           <div className="grid grid-cols-2 gap-4">
@@ -142,18 +171,26 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
                   placeholder="Insira a receita"
                   {...field}
                   onChange={field.onChange}
-                  value={maskInputMoney(field.value)}
+                  value={maskInputMoney(String(field.value))}
                   className={!revenueAsRange ? "col-span-2" : ""}
                   aria-invalid={!!errors.min_revenue}
                 />
               )}
             />
             {revenueAsRange && (
-              <Input
-                id="max_revenue"
-                placeholder="Insira a receita máxima"
-                {...register("max_revenue")}
-                aria-invalid={!!errors.max_revenue}
+              <Controller
+                name="max_revenue"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="max_revenue"
+                    placeholder="Insira a receita máxima"
+                    {...field}
+                    onChange={field.onChange}
+                    value={maskInputMoney(String(field.value))}
+                    aria-invalid={!!errors.max_revenue}
+                  />
+                )}
               />
             )}
           </div>
@@ -168,7 +205,7 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
             control={control}
             render={({ field }) => (
               <Select
-                value={field.value}
+                value={field.value ?? ""}
                 onValueChange={field.onChange}
                 aria-invalid={!!errors.cycle}
               >
@@ -216,7 +253,7 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
                 control={control}
                 render={({ field }) => (
                   <Select
-                    value={field.value}
+                    value={field.value ?? ""}
                     onValueChange={field.onChange}
                     aria-invalid={!!errors.benefits?.[index]?.type}
                   >
@@ -250,7 +287,7 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
                     placeholder="Insira o valor"
                     {...field}
                     onChange={field.onChange}
-                    value={maskInputMoney(field.value)}
+                    value={maskInputMoney(String(field.value))}
                     aria-invalid={!!errors.benefits?.[index]?.value}
                   />
                 )}
@@ -312,7 +349,7 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
                     placeholder="Insira o valor"
                     {...field}
                     onChange={field.onChange}
-                    value={maskInputMoney(field.value)}
+                    value={maskInputMoney(String(field.value))}
                     aria-invalid={!!errors.taxes?.[index]?.value}
                   />
                 )}

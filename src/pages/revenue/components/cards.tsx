@@ -34,6 +34,14 @@ interface RevenueCardsProps {
 }
 
 export function RevenueCards({ revenues, isLoading }: RevenueCardsProps) {
+  const setEditRevenueModalData = useRevenueStore(
+    (state) => state.setEditRevenueModalData,
+  );
+
+  const handleEditRevenue = (revenue: Revenue) => {
+    setEditRevenueModalData(true, revenue);
+  };
+
   const setDeleteRevenueAlertData = useRevenueStore(
     (state) => state.setDeleteRevenueAlertData,
   );
@@ -54,25 +62,7 @@ export function RevenueCards({ revenues, isLoading }: RevenueCardsProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {isLoading ? (
-        <>
-          {[...Array(3)].map((_, index) => (
-            <Card key={index}>
-              <CardHeader className="border-b border-zinc-200 dark:border-zinc-800">
-                <Skeleton className="w-14 h-4 mb-2" />
-                <Skeleton className="w-12 h-4 mb-2" />
-                <Skeleton className="w-20 h-4 mb-2" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="w-14 h-5 mb-3" />
-                <Skeleton className="w-full h-8 mb-3" />
-                <Skeleton className="w-full h-8 mb-3" />
-                <Skeleton className="w-full h-8" />
-              </CardContent>
-            </Card>
-          ))}
-        </>
-      ) : (
+      {!isLoading ? (
         <>
           {revenues?.map((revenue) => (
             <Card key={revenue.id}>
@@ -97,7 +87,9 @@ export function RevenueCards({ revenues, isLoading }: RevenueCardsProps) {
                     <DropdownMenuContent className="w-40" align="start">
                       <DropdownMenuGroup>
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleEditRevenue(revenue)}
+                        >
                           <PencilIcon />
                           Editar
                         </DropdownMenuItem>
@@ -113,7 +105,7 @@ export function RevenueCards({ revenues, isLoading }: RevenueCardsProps) {
                 </CardAction>
               </CardHeader>
               <CardContent>
-                {revenue.benefits && (
+                {revenue.benefits && revenue.benefits.length > 0 && (
                   <>
                     <h6 className="font-semibold mb-1">Benefícios:</h6>
                     <ul className="flex flex-col">
@@ -139,7 +131,7 @@ export function RevenueCards({ revenues, isLoading }: RevenueCardsProps) {
                     </ul>
                   </>
                 )}
-                {revenue.taxes && (
+                {revenue.taxes && revenue.taxes.length > 0 && (
                   <>
                     <h6 className="font-semibold mt-2 mb-1">Impostos:</h6>
                     <ul className="flex flex-col">
@@ -162,6 +154,24 @@ export function RevenueCards({ revenues, isLoading }: RevenueCardsProps) {
                     </ul>
                   </>
                 )}
+              </CardContent>
+            </Card>
+          ))}
+        </>
+      ) : (
+        <>
+          {[...Array(3)].map((_, index) => (
+            <Card key={index}>
+              <CardHeader className="border-b border-zinc-200 dark:border-zinc-800">
+                <Skeleton className="w-14 h-4 mb-2" />
+                <Skeleton className="w-12 h-4 mb-2" />
+                <Skeleton className="w-20 h-4 mb-2" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="w-14 h-5 mb-3" />
+                <Skeleton className="w-full h-8 mb-3" />
+                <Skeleton className="w-full h-8 mb-3" />
+                <Skeleton className="w-full h-8" />
               </CardContent>
             </Card>
           ))}
