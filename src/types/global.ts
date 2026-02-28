@@ -5,6 +5,7 @@ export type InfoCardProps = {
   title: string;
   value: string;
   icon?: ReactNode;
+  loading?: boolean;
 }
 
 export type PageHeaderProps = {

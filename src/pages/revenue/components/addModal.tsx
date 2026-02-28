@@ -11,8 +11,12 @@ import useRevenueStore from "@/storage/revenue";
 import { RevenueForm } from "./form";
 import type { RevenueFormData } from "@/types/forms/revenue/form";
 import { Button } from "@/components/ui/button";
+import { handleMutationError, post } from "@/utils/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function RevenueAddModal() {
+  const queryClient = useQueryClient();
   const addRevenueModalOpen = useRevenueStore(
     (state) => state.addRevenueModalOpen,
   );
@@ -21,8 +25,24 @@ export function RevenueAddModal() {
   );
 
   function handleAddRevenue(data: RevenueFormData) {
-    console.log("Dados do formulário:", data);
+    mutation.mutate(data);
   }
+
+  const mutation = useMutation({
+    mutationFn: async (data: RevenueFormData) => {
+      const response = await post("/revenues", data);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Renda adicionada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["revenues"] });
+      setAddRevenueModalOpen(false);
+    },
+    onError: (error) => {
+      const message = handleMutationError(error);
+      toast.error(message);
+    },
+  });
 
   return (
     <Dialog open={addRevenueModalOpen} onOpenChange={setAddRevenueModalOpen}>
@@ -39,7 +59,11 @@ export function RevenueAddModal() {
           <DialogClose asChild>
             <Button variant="outline">Cancelar</Button>
           </DialogClose>
-          <Button type="submit" form="revenue-form">
+          <Button
+            type="submit"
+            form="revenue-form"
+            loading={mutation.isPending}
+          >
             Adicionar
           </Button>
         </DialogFooter>

@@ -1,3 +1,4 @@
+import { removeMask } from "@/utils/mask";
 import * as z from "zod";
 
 export const revenueTypes = {
@@ -33,7 +34,7 @@ const revenueBenefitSchema = z.object({
     ),
   value: z.string()
     .min(1, "O valor é obrigatório.")
-    .transform((val) => parseFloat(val))
+    .transform((val) => parseInt(removeMask(val)))
     .refine((val) => !isNaN(val), "Formato inválido.")
     .refine((val) => val >= 0, "O valor deve ser positivo."),
 });
@@ -42,7 +43,7 @@ const revenueTaxesSchema = z.object({
   name: z.string().min(1, "O nome do imposto é obrigatório."),
   value: z.string()
     .min(1, "O valor do imposto é obrigatório.")
-    .transform((val) => parseFloat(val))
+    .transform((val) => parseInt(removeMask(val)))
     .refine((val) => !isNaN(val), "Formato inválido.")
     .refine((val) => val >= 0, "O valor do imposto deve ser positivo."),
 });
@@ -52,12 +53,12 @@ export const revenueFormSchema = z.object({
   type: z.enum(revenueTypesArray, "Selecione um tipo válido."),
   revenueAsRange: z.boolean(),
   min_revenue: z.string()
-    .transform((val) => parseFloat(val)).refine((val) => !isNaN(val), "A receita deve ser um número válido.")
+    .transform((val) => parseInt(removeMask(val))).refine((val) => !isNaN(val), "A receita deve ser um número válido.")
     .refine((val) => val >= 0, "A receita deve ser um número positivo."),
   max_revenue: z.preprocess(
     (val) => (val === "" || val === null || val === undefined ? undefined : val),
     z.string()
-      .transform((val) => parseFloat(val))
+      .transform((val) => parseInt(removeMask(val)))
       .refine((val) => !isNaN(val), "A receita máxima deve ser um número válido.")
       .refine((val) => val >= 0, "A receita máxima deve ser um número positivo.")
       .optional(),

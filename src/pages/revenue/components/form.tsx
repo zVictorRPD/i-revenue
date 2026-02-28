@@ -29,6 +29,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { maskInputMoney } from "@/utils/mask";
 
 interface RevenueFormProps {
   onSubmit: (data: RevenueFormData) => void;
@@ -132,12 +133,20 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
             </div>
           </FieldLabel>
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              id="min_revenue"
-              placeholder="Insira a receita"
-              className={!revenueAsRange ? "col-span-2" : ""}
-              {...register("min_revenue")}
-              aria-invalid={!!errors.min_revenue}
+            <Controller
+              name="min_revenue"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="min_revenue"
+                  placeholder="Insira a receita"
+                  {...field}
+                  onChange={field.onChange}
+                  value={maskInputMoney(field.value)}
+                  className={!revenueAsRange ? "col-span-2" : ""}
+                  aria-invalid={!!errors.min_revenue}
+                />
+              )}
             />
             {revenueAsRange && (
               <Input
@@ -232,11 +241,19 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
               <FieldLabel htmlFor={`benefitValue-${benefit.id}`}>
                 Valor
               </FieldLabel>
-              <Input
-                id={`benefitValue-${benefit.id}`}
-                placeholder="Insira o valor"
-                {...register(`benefits.${index}.value`)}
-                aria-invalid={!!errors.benefits?.[index]?.value}
+              <Controller
+                name={`benefits.${index}.value`}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id={`benefitValue-${benefit.id}`}
+                    placeholder="Insira o valor"
+                    {...field}
+                    onChange={field.onChange}
+                    value={maskInputMoney(field.value)}
+                    aria-invalid={!!errors.benefits?.[index]?.value}
+                  />
+                )}
               />
               <FieldError>
                 {errors.benefits?.[index]?.value?.message}
@@ -286,11 +303,19 @@ export function RevenueForm({ onSubmit }: RevenueFormProps) {
             </Field>
             <Field>
               <FieldLabel htmlFor={`taxValue-${tax.id}`}>Valor</FieldLabel>
-              <Input
-                id={`taxValue-${tax.id}`}
-                placeholder="Insira o valor"
-                {...register(`taxes.${index}.value`)}
-                aria-invalid={!!errors.taxes?.[index]?.value}
+              <Controller
+                name={`taxes.${index}.value`}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id={`taxValue-${tax.id}`}
+                    placeholder="Insira o valor"
+                    {...field}
+                    onChange={field.onChange}
+                    value={maskInputMoney(field.value)}
+                    aria-invalid={!!errors.taxes?.[index]?.value}
+                  />
+                )}
               />
               <FieldError>{errors.taxes?.[index]?.value?.message}</FieldError>
             </Field>

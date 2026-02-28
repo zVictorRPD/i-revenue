@@ -21,3 +21,10 @@ export type Revenue = {
     cycle: typeof revenueCyclesArray[number];
   }[];
 }
+
+export type CalculatedRevenueData = {
+  total_min_revenue: number;
+  total_max_revenue: number;
+  total_benefits: number;
+  total_taxes: number;
+};
