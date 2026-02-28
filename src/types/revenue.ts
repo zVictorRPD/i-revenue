@@ -1,10 +1,11 @@
 import type { BenefitType, RevenueType } from "./global";
+import { revenueCyclesArray } from "./forms/revenue/form";
 
 export type Revenue = {
   id: number;
   name: string;
   type: RevenueType;
-  cycle: 'monthly' | 'yearly';
+  cycle: typeof revenueCyclesArray[number];
   min_revenue: number;
   max_revenue: number;
   benefits?: {
@@ -12,11 +13,11 @@ export type Revenue = {
     type: BenefitType;
     name: string;
     value: number;
-    cycle: 'monthly' | 'yearly';
+    cycle: typeof revenueCyclesArray[number];
   }[];
   taxes?: {
     name: string;
     value: number;
-    cycle: 'monthly' | 'yearly';
+    cycle: typeof revenueCyclesArray[number];
   }[];
 }

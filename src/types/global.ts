@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { revenueBenefitsArray, revenueTypesArray } from "./forms/revenue/form";
 
 export type InfoCardProps = {
   title: string;
@@ -15,8 +16,8 @@ export type PageHeaderProps = {
   }
 }
 
-export type RevenueType = 'clt' | 'pj' | 'freelance' | 'donation' | 'other';
-export type BenefitType = 'food' | 'health' | 'transport';
+export type RevenueType = typeof revenueTypesArray[number];
+export type BenefitType = typeof revenueBenefitsArray[number];
 export type AllIconTypes = RevenueType | BenefitType;
 export type TypeIconsProps = {
   type: AllIconTypes;
