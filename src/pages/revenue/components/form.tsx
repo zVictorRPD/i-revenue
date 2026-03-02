@@ -45,7 +45,7 @@ export function RevenueForm({ onSubmit, revenue }: RevenueFormProps) {
   const defaultValues = useMemo(
     () => ({
       name: revenue?.name ?? "",
-      type: revenue?.type || "other",
+      type: revenue?.type || undefined,
       revenueAsRange:
         revenue?.max_revenue !== null && revenue?.max_revenue !== undefined,
       min_revenue:
@@ -54,7 +54,7 @@ export function RevenueForm({ onSubmit, revenue }: RevenueFormProps) {
         revenue?.max_revenue !== null && revenue?.max_revenue !== undefined
           ? String(revenue.max_revenue)
           : "",
-      cycle: revenue?.cycle || "monthly",
+      cycle: revenue?.cycle || undefined,
       benefits:
         revenue?.benefits?.map((benefit) => ({
           type: benefit.type,
